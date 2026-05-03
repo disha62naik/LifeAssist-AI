@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Tasks — LifeAssist AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Task <span class="accent">Manager</span></h1>
+  <p class="subtitle">Track and manage your daily tasks</p>
+</div>
+
+<div class="two-col">
+  <!-- Add Task -->
+  <div class="card">
+    <h2 class="card-title">Add New Task</h2>
+    <form method="POST" class="form-inline">
+      <input type="hidden" name="action" value="add">
+      <div class="form-group">
+        <label>Task Name</label>
+        <input type="text" name="task_name" placeholder="e.g. Review project proposal" required>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <select name="priority">
+          <option value="High">🔴 High</option>
+          <option value="Medium" selected>🟡 Medium</option>
+          <option value="Low">🟢 Low</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Add Task +</button>
+    </form>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <h2 class="card-title">Summary</h2>
+    <div class="task-summary">
+      {% set done = tasks | selectattr('done') | list | length %}
+      {% set total = tasks | length %}
+      {% set pct = ((done / total * 100) | int) if total > 0 else 0 %}
+      <div class="summary-stat"><span>{{ total }}</span><p>Total</p></div>
+      <div class="summary-stat"><span>{{ done }}</span><p>Done</p></div>
+      <div class="summary-stat"><span>{{ total - done }}</span><p>Pending</p></div>
+      <div class="progress-wrap">
+        <div class="progress-label">{{ pct }}% complete</div>
+        <div class="progress-bar"><div class="progress-fill" style="width: {{ pct }}%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Task List -->
+<div class="card mt">
+  <h2 class="card-title">All Tasks</h2>
+  {% if tasks %}
+  <ul class="task-list">
+    {% for task in tasks %}
+    <li class="task-item {% if task.done %}done{% endif %}">
+      <div class="task-left">
+        <span class="priority-badge priority-{{ task.priority | lower }}">{{ task.priority }}</span>
+        <span class="task-name-full">{{ task.name }}</span>
+      </div>
+      <div class="task-actions">
+        <form method="POST" style="display:inline">
+          <input type="hidden" name="action" value="toggle">
+          <input type="hidden" name="index" value="{{ loop.index0 }}">
+          <button type="submit" class="btn-icon" title="Toggle">
+            {% if task.done %}↩️{% else %}✅{% endif %}
+          </button>
+        </form>
+        <form method="POST" style="display:inline">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="index" value="{{ loop.index0 }}">
+          <button type="submit" class="btn-icon btn-delete" title="Delete">🗑️</button>
+        </form>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="empty-state">
+    <p>No tasks yet. Add one above!</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

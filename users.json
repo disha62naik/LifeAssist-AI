@@ -1,0 +1,14 @@
+{
+  "user_1": {
+    "password": "user1234567890",
+    "tasks": [],
+    "productivity_history": [
+      {
+        "score": 56.0,
+        "label": "Average \ud83d\udcca",
+        "completed": 3,
+        "total": 5
+      }
+    ]
+  }
+}

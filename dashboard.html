@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — LifeAssist AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Good day, <span class="accent">{{ username }}</span> 👋</h1>
+  <p class="subtitle">Here's your productivity overview</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">📋</div>
+    <div class="stat-info">
+      <h3>{{ tasks | length }}</h3>
+      <p>Total Tasks</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">✅</div>
+    <div class="stat-info">
+      <h3>{{ tasks | selectattr('done') | list | length }}</h3>
+      <p>Completed</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">📊</div>
+    <div class="stat-info">
+      <h3>{{ avg_score }}%</h3>
+      <p>Avg Score</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">📈</div>
+    <div class="stat-info">
+      <h3>{{ history | length }}</h3>
+      <p>Sessions</p>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <!-- Quick Actions -->
+  <div class="card">
+    <h2 class="card-title">Quick Actions</h2>
+    <div class="quick-actions">
+      <a href="{{ url_for('tasks') }}" class="qa-btn">
+        <span>📋</span>
+        <div><strong>Manage Tasks</strong><small>Add & track tasks</small></div>
+      </a>
+      <a href="{{ url_for('decision') }}" class="qa-btn">
+        <span>🎯</span>
+        <div><strong>Decision Helper</strong><small>Pick the best option</small></div>
+      </a>
+      <a href="{{ url_for('planner') }}" class="qa-btn">
+        <span>🗓️</span>
+        <div><strong>Daily Planner</strong><small>Generate your schedule</small></div>
+      </a>
+      <a href="{{ url_for('productivity') }}" class="qa-btn">
+        <span>📊</span>
+        <div><strong>Productivity</strong><small>Calculate your score</small></div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Tasks -->
+  <div class="card">
+    <h2 class="card-title">Recent Tasks</h2>
+    {% if tasks %}
+    <ul class="task-list-mini">
+      {% for task in tasks[-5:] %}
+      <li class="task-item-mini {% if task.done %}done{% endif %}">
+        <span class="priority-dot priority-{{ task.priority | lower }}"></span>
+        <span class="task-name">{{ task.name }}</span>
+        <span class="task-status">{% if task.done %}✅{% else %}⏳{% endif %}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    <a href="{{ url_for('tasks') }}" class="link-more">View all tasks →</a>
+    {% else %}
+    <div class="empty-state">
+      <p>No tasks yet. <a href="{{ url_for('tasks') }}">Add your first task →</a></p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Productivity History -->
+  <div class="card card-wide">
+    <h2 class="card-title">Recent Productivity Sessions</h2>
+    {% if history %}
+    <div class="history-list">
+      {% for h in history %}
+      <div class="history-item">
+        <div class="history-score" style="--score-color: {% if h.score >= 70 %}#22c55e{% elif h.score >= 50 %}#f59e0b{% else %}#ef4444{% endif %}">
+          {{ h.score }}%
+        </div>
+        <div class="history-info">
+          <strong>{{ h.label }}</strong>
+          <small>{{ h.completed }}/{{ h.total }} tasks completed</small>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <p>No sessions logged yet. <a href="{{ url_for('productivity') }}">Track your productivity →</a></p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

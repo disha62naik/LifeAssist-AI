@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Decision Helper — LifeAssist AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Decision <span class="accent">Helper</span></h1>
+  <p class="subtitle">Can't choose? Let the system evaluate your options</p>
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <h2 class="card-title">Enter Your Options</h2>
+    <form method="POST" class="form-inline">
+      <div class="form-group">
+        <label>Options <small>(comma-separated)</small></label>
+        <input type="text" name="options" placeholder="e.g. Study now, Study later, Take a break" required>
+      </div>
+      <div class="form-group">
+        <label>Urgency <span class="range-val" id="urgency-val">5</span>/10</label>
+        <input type="range" name="urgency" id="urgency" min="1" max="10" value="5"
+               oninput="document.getElementById('urgency-val').textContent=this.value">
+      </div>
+      <div class="form-group">
+        <label>Importance <span class="range-val" id="importance-val">5</span>/10</label>
+        <input type="range" name="importance" id="importance" min="1" max="10" value="5"
+               oninput="document.getElementById('importance-val').textContent=this.value">
+      </div>
+      <div class="form-group">
+        <label>Effort Required <span class="range-val" id="effort-val">5</span>/10</label>
+        <input type="range" name="effort" id="effort" min="1" max="10" value="5"
+               oninput="document.getElementById('effort-val').textContent=this.value">
+        <small class="hint">Lower effort = higher score</small>
+      </div>
+      <button type="submit" class="btn btn-primary">Evaluate Options →</button>
+    </form>
+  </div>
+
+  {% if result %}
+  <div class="card result-card">
+    <h2 class="card-title">Result</h2>
+    {% if result.error %}
+    <div class="alert alert-error">{{ result.error }}</div>
+    {% else %}
+    <div class="best-option">
+      <div class="best-label">Best Choice</div>
+      <div class="best-name">{{ result.best }}</div>
+      <div class="best-score">Score: {{ result.score }}</div>
+      <p class="best-reason">{{ result.reason }}</p>
+    </div>
+    <h3 class="sub-title">All Rankings</h3>
+    <ol class="ranked-list">
+      {% for item in result.ranked %}
+      <li class="ranked-item {% if loop.first %}top-rank{% endif %}">
+        <span class="rank-num">#{{ loop.index }}</span>
+        <span class="rank-name">{{ item.option }}</span>
+        <div class="rank-bar-wrap">
+          <div class="rank-bar" style="width: {{ item.score }}%"></div>
+        </div>
+        <span class="rank-score">{{ item.score }}</span>
+      </li>
+      {% endfor %}
+    </ol>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="card hint-card">
+    <h2 class="card-title">How It Works</h2>
+    <ol class="how-list">
+      <li>Enter your options separated by commas</li>
+      <li>Set how urgent, important, and effortful each decision is</li>
+      <li>The system scores each option using a weighted formula</li>
+      <li>The highest-scoring option is recommended as the best choice</li>
+    </ol>
+    <div class="tip-box">
+      💡 <strong>Tip:</strong> More options = better comparison. Try entering at least 3 choices.
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

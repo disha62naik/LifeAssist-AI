@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Productivity — LifeAssist AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Productivity <span class="accent">Tracker</span></h1>
+  <p class="subtitle">Calculate your score and get smart suggestions</p>
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <h2 class="card-title">Log Your Session</h2>
+    <form method="POST" class="form-inline">
+      <div class="form-group">
+        <label>Total Tasks Planned</label>
+        <input type="number" name="total_tasks" min="1" max="100" placeholder="e.g. 10" required>
+      </div>
+      <div class="form-group">
+        <label>Tasks Completed</label>
+        <input type="number" name="completed_tasks" min="0" max="100" placeholder="e.g. 7" required>
+      </div>
+      <div class="form-group">
+        <label>Hours Worked</label>
+        <input type="number" name="hours_worked" min="0.5" max="24" step="0.5" placeholder="e.g. 6" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Calculate Score →</button>
+    </form>
+  </div>
+
+  {% if result %}
+  <div class="card result-card">
+    <h2 class="card-title">Your Result</h2>
+    <div class="score-display">
+      <div class="score-circle" style="--score: {{ result.score }}">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" class="score-bg"/>
+          <circle cx="60" cy="60" r="50" class="score-fill"
+                  style="stroke-dashoffset: calc(314 - (314 * {{ result.score }}) / 100)"/>
+        </svg>
+        <div class="score-inner">
+          <span class="score-num">{{ result.score }}</span>
+          <span class="score-unit">%</span>
+        </div>
+      </div>
+      <div class="score-label">{{ result.label }}</div>
+      <div class="score-meta">
+        {{ result.completed }}/{{ result.total }} tasks · {{ result.hours }}h worked
+      </div>
+    </div>
+
+    <h3 class="sub-title">Suggestions</h3>
+    <ul class="suggestion-list">
+      {% for s in result.suggestions %}
+      <li>{{ s }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% else %}
+  <div class="card hint-card">
+    <h2 class="card-title">Score Formula</h2>
+    <div class="formula-box">
+      <div class="formula-row">
+        <span>Completion Rate</span><span class="fw">60%</span>
+      </div>
+      <div class="formula-row">
+        <span>Efficiency (tasks/hr)</span><span class="fw">40%</span>
+      </div>
+    </div>
+    <ol class="how-list mt">
+      <li>Enter total tasks you planned for the day</li>
+      <li>Enter how many you actually completed</li>
+      <li>Enter total hours worked</li>
+      <li>Get a score from 0–100 with personalized suggestions</li>
+    </ol>
+    <div class="tip-box">
+      📊 <strong>Benchmark:</strong> 3 tasks/hour = 100% efficiency rating.
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
